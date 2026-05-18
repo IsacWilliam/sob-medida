@@ -10,77 +10,77 @@ interface Cliente {
     observacoes: string;
 }
 
-export default function ClientScreen() {
-    const [clientes, setClientes] = useState<Cliente[]>([]);
-
-    function carregarClientes() {
-        try {
-
-            const resultado = database.getAllSync(
-                `SELECT * FROM clientes ORDER BY id DESC`
-            ) as Cliente[];
-
-            setClientes(resultado);
-        } catch(error) {
-            console.log(error);
-        }
+export default function ClientsScreen({ navigation }: any) {
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  
+  function carregarClientes() {
+    try {
+      const resultado = database.getAllSync(
+        `SELECT * FROM clientes ORDER BY id DESC`
+      ) as Cliente[];
+      
+      setClientes(resultado);
+    
+    } catch(error) {
+      console.log(error);
     }
+  }
+  
+  useEffect(() => { carregarClientes() }, []);
+  
+  return (
+  
+  <View style={styles.container}>
+    
+    <Text style={styles.title}>
+      Clientes
+    </Text>
 
-    useEffect(() => {
-        carregarClientes();
-    }, []);
-
-    return (
-    <View style={styles.container}>
-
-      <Text style={styles.title}>
-        Clientes
+    <TouchableOpacity
+      style={styles.refreshButton}
+      onPress={carregarClientes}
+    >
+      <Text style={styles.refreshText}>
+        Atualizar Lista
       </Text>
+    </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.refreshButton}
-        onPress={carregarClientes}
-      >
-        <Text style={styles.refreshText}>
-          Atualizar Lista
-        </Text>
-      </TouchableOpacity>
+    <FlatList
+      data={clientes}
+      keyExtractor={ (item) => item.id.toString() }
+      renderItem={ ({ item }) => (
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate(
+            'DetalhesCliente',
+            {
+              cliente: item
+            }
+          )}>
 
-      <FlatList
-        data={clientes}
-        keyExtractor={(item) =>
-          item.id.toString()
-        }
-        renderItem={({ item }) => (
-
-          <View style={styles.card}>
-
-            <Text style={styles.nome}>
-              {item.nome}
-            </Text>
-
-            <Text style={styles.info}>
-              {item.telefone}
-            </Text>
-
-            <Text style={styles.info}>
-              {item.email}
-            </Text>
-
-          </View>
-
+          <Text style={styles.nome}>
+            {item.nome}
+          </Text>
+          
+          <Text style={styles.info}>
+            {item.telefone}
+          </Text>
+          
+          <Text style={styles.info}>
+            {item.email}
+          </Text>
+        </TouchableOpacity>
         )}
       />
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#F5EFE6',
-        padding: 20,
+      flex: 1,
+      backgroundColor: '#F5EFE6',
+      padding: 20,
     },
 
     title: {

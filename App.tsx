@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './src/screens/HomeScreen';
 import NewClientScreen from './src/screens/NewClientScreen';
 import ClientsScreen from './src/screens/ClientsScreen';
+import ClientDetailsScreen from './src/screens/ClientDetailsScreen';
 
 import { initializeDatabase } from './src/database/database';
 
@@ -40,6 +41,14 @@ useEffect(() => {
           component={ClientsScreen}
           options={{
             title:'Clientes'
+          }}
+        />
+
+        <Stack.Screen
+            name="DetalhesCliente"
+            component={ClientDetailsScreen}
+            options={{
+            title: 'Detalhes do Cliente'
           }}
         />
       </Stack.Navigator>
