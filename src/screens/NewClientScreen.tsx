@@ -21,7 +21,7 @@ export default function NewClientScreen() {
                 `
                     INSERT INTO clientes
                     (nome, telefone, email,observacoes)
-                    VALUES (?, ?, ?)
+                    VALUES (?, ?, ?,?)
                 `,
                 [nome, telefone, email, observacoes]
             );

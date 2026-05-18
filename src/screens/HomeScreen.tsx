@@ -29,6 +29,16 @@ export default function HomeScreen({ navigation }: any) {
         </Text>
       </TouchableOpacity>
 
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          navigation.navigate('Clientes')
+        }
+      >
+        <Text style={styles.buttonText}>
+          Ver Clientes
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -61,6 +71,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 30,
     borderRadius: 10,
+    marginBottom: 15
   },
 
   buttonText: {

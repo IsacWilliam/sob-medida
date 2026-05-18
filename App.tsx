@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import HomeScreen from './src/screens/HomeScreen';
 import NewClientScreen from './src/screens/NewClientScreen';
+import ClientsScreen from './src/screens/ClientsScreen';
 
 import { initializeDatabase } from './src/database/database';
 
@@ -31,6 +32,14 @@ useEffect(() => {
           component={NewClientScreen}
           options={{
           title: 'Novo Cliente',
+          }}
+        />
+
+        <Stack.Screen
+          name='Clientes'
+          component={ClientsScreen}
+          options={{
+            title:'Clientes'
           }}
         />
       </Stack.Navigator>
