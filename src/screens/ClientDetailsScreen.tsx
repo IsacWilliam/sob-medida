@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 
-export default function ClientDetailsScreen({ route }: any) {
+export default function ClientDetailsScreen({ route, navigation }: any) {
 
   const { cliente } = route.params;
 
@@ -47,6 +47,20 @@ export default function ClientDetailsScreen({ route }: any) {
 
       </View>
 
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate(
+          'Medidas',
+          {
+            cliente,
+          }
+        )}>
+          
+        <Text style={styles.buttonText}>
+          Adicionar Medidas
+        </Text>
+      </TouchableOpacity>
+    
     </ScrollView>
   );
 }
@@ -83,5 +97,19 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 17,
     color: '#444',
+  },
+
+  button: {
+    backgroundColor: '#7A3E2B',
+    padding: 18,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+
+  buttonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });

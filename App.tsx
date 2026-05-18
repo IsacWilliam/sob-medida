@@ -7,6 +7,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import NewClientScreen from './src/screens/NewClientScreen';
 import ClientsScreen from './src/screens/ClientsScreen';
 import ClientDetailsScreen from './src/screens/ClientDetailsScreen';
+import MeasurementsScreen from './src/screens/MeasurementsScreen';
 
 import { initializeDatabase } from './src/database/database';
 
@@ -51,6 +52,14 @@ useEffect(() => {
             title: 'Detalhes do Cliente'
           }}
         />
+
+        <Stack.Screen
+            name="Medidas"
+            component={MeasurementsScreen}
+            options={{
+              title: 'Medidas',
+            }}
+          />
       </Stack.Navigator>
     </NavigationContainer>
   );
