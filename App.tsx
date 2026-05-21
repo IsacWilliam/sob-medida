@@ -8,6 +8,7 @@ import NewClientScreen from './src/screens/NewClientScreen';
 import ClientsScreen from './src/screens/ClientsScreen';
 import ClientDetailsScreen from './src/screens/ClientDetailsScreen';
 import MeasurementsScreen from './src/screens/MeasurementsScreen';
+import EditClientScreen from './src/screens/EditClientScreen';
 
 import { initializeDatabase } from './src/database/database';
 
@@ -60,6 +61,14 @@ useEffect(() => {
               title: 'Medidas',
             }}
           />
+
+        <Stack.Screen
+          name="EditarCliente"
+          component={EditClientScreen}
+          options={{
+            title: 'Editar Cliente',
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
