@@ -24,6 +24,18 @@ export function initializeDatabase(){
       comprimento TEXT
     );
   `);
+
+  database.execSync(`
+    CREATE TABLE IF NOT EXISTS encomendas (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      cliente_id INTEGER,
+      peca TEXT NOT NULL,
+      valor TEXT,
+      prazo TEXT,
+      status TEXT,
+      observacoes TEXT
+    );
+  `);
 }
 
 export default database;

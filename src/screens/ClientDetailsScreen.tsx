@@ -225,6 +225,22 @@ export default function ClientDetailsScreen({
       </TouchableOpacity>
 
       <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          navigation.navigate(
+            'NovaEncomenda',
+            {
+              cliente,
+            }
+          )
+        }
+      >
+        <Text style={styles.buttonText}>
+          Nova Encomenda
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={styles.deleteButton}
         onPress={excluirCliente}
       >

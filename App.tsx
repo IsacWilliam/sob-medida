@@ -9,6 +9,7 @@ import ClientsScreen from './src/screens/ClientsScreen';
 import ClientDetailsScreen from './src/screens/ClientDetailsScreen';
 import MeasurementsScreen from './src/screens/MeasurementsScreen';
 import EditClientScreen from './src/screens/EditClientScreen';
+import NewOrderScreen from './src/screens/NewOrderScreen';
 
 import { initializeDatabase } from './src/database/database';
 
@@ -67,6 +68,14 @@ useEffect(() => {
           component={EditClientScreen}
           options={{
             title: 'Editar Cliente',
+          }}
+        />
+        
+        <Stack.Screen
+          name="NovaEncomenda"
+          component={NewOrderScreen}
+          options={{
+            title: 'Nova Encomenda',
           }}
         />
       </Stack.Navigator>
