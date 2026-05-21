@@ -22,7 +22,24 @@ useEffect(() => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#7A3E2B',
+          },
+
+          headerTintColor: '#FFF',
+
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+
+          contentStyle: {
+            backgroundColor: '#F5EFE6',
+          },
+        }}>
+
         <Stack.Screen
           name="Home"
           component={HomeScreen}
@@ -35,7 +52,7 @@ useEffect(() => {
           name="NovoCliente"
           component={NewClientScreen}
           options={{
-          title: 'Novo Cliente',
+            title: 'Novo Cliente',
           }}
         />
 
@@ -48,20 +65,20 @@ useEffect(() => {
         />
 
         <Stack.Screen
-            name="DetalhesCliente"
-            component={ClientDetailsScreen}
-            options={{
+          name="DetalhesCliente"
+          component={ClientDetailsScreen}
+          options={{
             title: 'Detalhes do Cliente'
           }}
         />
 
         <Stack.Screen
-            name="Medidas"
-            component={MeasurementsScreen}
-            options={{
-              title: 'Medidas',
-            }}
-          />
+          name="Medidas"
+          component={MeasurementsScreen}
+          options={{
+            title: 'Medidas',
+          }}
+        />
 
         <Stack.Screen
           name="EditarCliente"
@@ -70,7 +87,7 @@ useEffect(() => {
             title: 'Editar Cliente',
           }}
         />
-        
+
         <Stack.Screen
           name="NovaEncomenda"
           component={NewOrderScreen}
