@@ -1,10 +1,20 @@
 import { useState } from 'react';
 
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+} from 'react-native';
 
 import database from '../database/database';
 
-export default function MeasurementsScreen({ route }: any) {
+export default function MeasurementsScreen({
+  route,
+}: any) {
 
   const { cliente } = route.params;
 
@@ -12,9 +22,27 @@ export default function MeasurementsScreen({ route }: any) {
   const [cintura, setCintura] = useState('');
   const [quadril, setQuadril] = useState('');
   const [ombro, setOmbro] = useState('');
-  const [comprimento, setComprimento] = useState('');
+  const [comprimento, setComprimento] =
+    useState('');
 
   function salvarMedidas() {
+
+    const todosVazios =
+      !busto.trim() &&
+      !cintura.trim() &&
+      !quadril.trim() &&
+      !ombro.trim() &&
+      !comprimento.trim();
+
+    if (todosVazios) {
+
+      Alert.alert(
+        'Atenção',
+        'Preencha ao menos uma medida'
+      );
+
+      return;
+    }
 
     try {
 
@@ -45,6 +73,12 @@ export default function MeasurementsScreen({ route }: any) {
         'Sucesso',
         'Medidas salvas com sucesso'
       );
+
+      setBusto('');
+      setCintura('');
+      setQuadril('');
+      setOmbro('');
+      setComprimento('');
 
     } catch (error) {
 
