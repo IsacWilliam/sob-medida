@@ -1,13 +1,5 @@
 import { useEffect, useState } from 'react';
-
-import {
-  View,
-  Text,
- StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, } from 'react-native';
 
 import database from '../database/database';
 
@@ -19,13 +11,22 @@ interface Medidas {
   comprimento: string;
 }
 
+interface Encomenda {
+  id: number;
+  peca: string;
+  valor: string;
+  prazo: string;
+  status: string;
+  observacoes: string;
+}
+
 export default function ClientDetailsScreen({
   route,
   navigation,
 }: any) {
 
-  const [medidas, setMedidas] =
-    useState<Medidas | null>(null);
+  const [medidas, setMedidas] = useState<Medidas | null>(null);
+  const [encomendas, setEncomendas] = useState<Encomenda[]>([]);
 
   const { cliente } = route.params;
 
@@ -51,8 +52,29 @@ export default function ClientDetailsScreen({
     }
   }
 
+  function carregarEncomendas() {
+
+  try {
+
+    const resultado = database.getAllSync(
+      `
+        SELECT *
+        FROM encomendas
+        WHERE cliente_id = ?
+        ORDER BY id DESC
+      `,
+      [cliente.id]
+    ) as Encomenda[];
+
+    setEncomendas(resultado);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
   useEffect(() => {
     carregarMedidas();
+    carregarEncomendas();
   }, []);
 
   function excluirCliente() {
@@ -192,6 +214,51 @@ export default function ClientDetailsScreen({
 
       </View>
 
+      <View style={styles.card}>
+
+        <Text style={styles.label}>
+          Encomendas
+        </Text>
+
+        {
+          encomendas.length > 0 ? (
+          
+            encomendas.map((item) => (
+            
+              <View
+                key={item.id}
+                style={styles.orderCard}
+              >
+              
+                <Text style={styles.orderTitle}>
+                  {item.peca}
+                </Text>
+            
+                <Text style={styles.value}>
+                  Valor: {item.valor || 'Não informado'}
+                </Text>
+            
+                <Text style={styles.value}>
+                  Prazo: {item.prazo || 'Não informado'}
+                </Text>
+            
+                <Text style={styles.value}>
+                  Status: {item.status || 'Não informado'}
+                </Text>
+            
+              </View>
+            ))
+          
+          ) : (
+          
+            <Text style={styles.value}>
+              Nenhuma encomenda cadastrada
+            </Text>
+          )
+        }
+
+      </View>
+
       <TouchableOpacity
         style={styles.button}
         onPress={() =>
@@ -308,5 +375,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 15,
+  },
+
+  orderCard: {
+    backgroundColor: '#F8F8F8',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+
+  orderTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#7A3E2B',
+    marginBottom: 8,
   },
 });
