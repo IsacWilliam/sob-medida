@@ -1,29 +1,15 @@
 import { useState } from 'react';
-
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ScrollView,
-} from 'react-native';
-
+import { Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import database from '../database/database';
 
-export default function MeasurementsScreen({
-  route,
-}: any) {
-
+export default function MeasurementsScreen({ route }: any) {
   const { cliente } = route.params;
 
   const [busto, setBusto] = useState('');
   const [cintura, setCintura] = useState('');
   const [quadril, setQuadril] = useState('');
   const [ombro, setOmbro] = useState('');
-  const [comprimento, setComprimento] =
-    useState('');
+  const [comprimento, setComprimento] = useState('');
 
   function salvarMedidas() {
 
@@ -36,43 +22,17 @@ export default function MeasurementsScreen({
 
     if (todosVazios) {
 
-      Alert.alert(
-        'Atenção',
-        'Preencha ao menos uma medida'
-      );
-
+      Alert.alert('Atenção', 'Preencha ao menos uma medida');
       return;
     }
 
     try {
-
       database.runSync(
-        `
-          INSERT INTO medidas
-          (
-            cliente_id,
-            busto,
-            cintura,
-            quadril,
-            ombro,
-            comprimento
-          )
-          VALUES (?, ?, ?, ?, ?, ?)
-        `,
-        [
-          cliente.id,
-          busto,
-          cintura,
-          quadril,
-          ombro,
-          comprimento,
-        ]
+        `INSERT INTO medidas (cliente_id, busto, cintura, quadril, ombro, comprimento) VALUES (?, ?, ?, ?, ?, ?)`,
+        [cliente.id, busto, cintura, quadril, ombro, comprimento ]
       );
 
-      Alert.alert(
-        'Sucesso',
-        'Medidas salvas com sucesso'
-      );
+      Alert.alert('Sucesso', 'Medidas salvas com sucesso!');
 
       setBusto('');
       setCintura('');
@@ -84,25 +44,15 @@ export default function MeasurementsScreen({
 
       console.log(error);
 
-      Alert.alert(
-        'Erro',
-        'Não foi possível salvar as medidas'
-      );
+      Alert.alert('Erro', 'Não foi possível salvar as medidas');
     }
   }
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-    >
+    <ScrollView contentContainerStyle={styles.container}>
 
-      <Text style={styles.title}>
-        Medidas
-      </Text>
-
-      <Text style={styles.clientName}>
-        {cliente.nome}
-      </Text>
+      <Text style={styles.title}>Medidas</Text>
+      <Text style={styles.clientName}>{cliente.nome}</Text>
 
       <TextInput
         placeholder="Busto"
@@ -139,21 +89,16 @@ export default function MeasurementsScreen({
         onChangeText={setComprimento}
       />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={salvarMedidas}
-      >
-        <Text style={styles.buttonText}>
-          Salvar Medidas
-        </Text>
+      <TouchableOpacity style={styles.button} onPress={salvarMedidas}>
+        
+        <Text style={styles.buttonText}>Salvar Medidas</Text>
+      
       </TouchableOpacity>
-
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flexGrow: 1,
     backgroundColor: '#F5EFE6',

@@ -1,99 +1,43 @@
 import { useState } from 'react';
-
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import database from '../database/database';
 
-export default function NewOrderScreen({
-  route,
-  navigation,
-}: any) {
-
+export default function NewOrderScreen({ route, navigation }: any) {
   const { cliente } = route.params;
 
-  const [peca, setPeca] = useState('');
-  const [valor, setValor] = useState('');
-  const [prazo, setPrazo] = useState('');
-  const [status, setStatus] =
-    useState('Em andamento');
-
-  const [observacoes, setObservacoes] =
-    useState('');
+  const [peca, setPeca]               = useState('');
+  const [valor, setValor]             = useState('');
+  const [prazo, setPrazo]             = useState('');
+  const [status, setStatus]           = useState('Em andamento');
+  const [observacoes, setObservacoes] = useState('');
 
   function salvarEncomenda() {
-
     if (!peca.trim()) {
-
-      Alert.alert(
-        'Atenção',
-        'Digite a peça'
-      );
-
+      Alert.alert('Atenção', 'Digite a peça');
       return;
     }
 
     try {
-
       database.runSync(
-        `
-          INSERT INTO encomendas
-          (
-            cliente_id,
-            peca,
-            valor,
-            prazo,
-            status,
-            observacoes
-          )
-          VALUES (?, ?, ?, ?, ?, ?)
-        `,
-        [
-          cliente.id,
-          peca,
-          valor,
-          prazo,
-          status,
-          observacoes,
-        ]
+        `INSERT INTO encomendas (cliente_id, peca, valor, prazo, status, observacoes) VALUES (?, ?, ?, ?, ?, ?)`,
+        [cliente.id, peca, valor, prazo, status, observacoes,]
       );
 
-      Alert.alert(
-        'Sucesso',
-        'Encomenda salva'
-      );
-
+      Alert.alert('Sucesso', 'Encomenda salva');
       navigation.goBack();
 
     } catch (error) {
 
       console.log(error);
-
-      Alert.alert(
-        'Erro',
-        'Não foi possível salvar'
-      );
+      Alert.alert('Erro', 'Não foi possível salvar');
     }
   }
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-    >
+    <ScrollView contentContainerStyle={styles.container}>
 
-      <Text style={styles.title}>
-        Nova Encomenda
-      </Text>
-
-      <Text style={styles.clientName}>
-        {cliente.nome}
-      </Text>
+      <Text style={styles.title}>Nova Encomenda</Text>
+      <Text style={styles.clientName}>{cliente.nome}</Text>
 
       <TextInput
         placeholder="Peça"
@@ -132,21 +76,16 @@ export default function NewOrderScreen({
         onChangeText={setObservacoes}
       />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={salvarEncomenda}
-      >
-        <Text style={styles.buttonText}>
-          Salvar Encomenda
-        </Text>
-      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={salvarEncomenda}>
 
+        <Text style={styles.buttonText}>Salvar Encomenda</Text>
+
+      </TouchableOpacity>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flexGrow: 1,
     backgroundColor: '#F5EFE6',

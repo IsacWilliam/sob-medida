@@ -1,7 +1,6 @@
 import { useState } from "react";
-
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
-
+import { Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { formatPhoneNumber } from '../utils/phoneMask';
 import database from "../database/database";
 
 export default function NewClientScreen() {
@@ -18,11 +17,7 @@ export default function NewClientScreen() {
 
         try{
             database.runSync(
-                `
-                    INSERT INTO clientes
-                    (nome, telefone, email,observacoes)
-                    VALUES (?, ?, ?,?)
-                `,
+                `INSERT INTO clientes (nome, telefone, email,observacoes) VALUES (?, ?, ?,?)`,
                 [nome, telefone, email, observacoes]
             );
 
@@ -55,7 +50,9 @@ export default function NewClientScreen() {
                 placeholder="Telefone"
                 style={styles.input}
                 value={telefone}
-                onChangeText={setTelefone}
+                onChangeText={(value) => setTelefone(formatPhoneNumber(value))}
+                keyboardType="phone-pad"
+                maxLength={16}
             />
 
             <TextInput
@@ -73,9 +70,9 @@ export default function NewClientScreen() {
             />
 
             <TouchableOpacity style={styles.button} onPress={salvarCliente}>
-                <Text style={styles.buttonText}>
-                    Salvar Cliente
-                </Text>
+                
+                <Text style={styles.buttonText}>Salvar Cliente</Text>
+
             </TouchableOpacity>
         </ScrollView>
     );

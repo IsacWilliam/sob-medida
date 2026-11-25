@@ -1,48 +1,45 @@
-import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { useCallback, useState } from "react";
+import { Alert, View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { formatPhoneNumber } from '../utils/phoneMask';
 import database from "../database/database";
 
 interface Cliente {
     id: number;
     nome: string;
-    telefone: string;
-    email: string;
-    observacoes: string;
+    telefone: string | null;
+    email: string | null;
+    observacoes: string | null;
 }
 
 export default function ClientsScreen({ navigation }: any) {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   
-  function carregarClientes() {
+  const carregarClientes = useCallback(() => {
     try {
-      const resultado = database.getAllSync(
-        `SELECT * FROM clientes ORDER BY id DESC`
-      ) as Cliente[];
+      const resultado = database.getAllSync(`SELECT * FROM clientes ORDER BY id DESC`) as Cliente[];
       
       setClientes(resultado);
     
     } catch(error) {
-      console.log(error);
+      console.error(error);
+      Alert.alert('Erro', 'Não foi possível carregar a lista de clientes.');
     }
-  }
+  }, []);
   
-  useEffect(() => { carregarClientes() }, []);
+  useFocusEffect( useCallback(() => { carregarClientes() }, [carregarClientes]));
   
   return (
   
   <View style={styles.container}>
     
-    <Text style={styles.title}>
-      Clientes
-    </Text>
+    <Text style={styles.title}>Clientes</Text>
 
     <TouchableOpacity
       style={styles.refreshButton}
-      onPress={carregarClientes}
-    >
-      <Text style={styles.refreshText}>
-        Atualizar Lista
-      </Text>
+      onPress={carregarClientes} >
+
+      <Text style={styles.refreshText}>Atualizar Lista</Text>
     </TouchableOpacity>
 
     <FlatList
@@ -51,24 +48,13 @@ export default function ClientsScreen({ navigation }: any) {
       renderItem={ ({ item }) => (
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate(
-            'DetalhesCliente',
-            {
-              cliente: item
-            }
-          )}>
+          onPress={() => navigation.navigate('DetalhesCliente', { cliente: item })} >
 
-          <Text style={styles.nome}>
-            {item.nome}
-          </Text>
+          <Text style={styles.nome}>{ item.nome }</Text>
           
-          <Text style={styles.info}>
-            {item.telefone}
-          </Text>
+          <Text style={styles.info}>{ formatPhoneNumber(item.telefone ?? '') }</Text>
           
-          <Text style={styles.info}>
-            {item.email}
-          </Text>
+          <Text style={styles.info}>{ item.email }</Text>
         </TouchableOpacity>
         )}
       />

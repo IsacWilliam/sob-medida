@@ -1,50 +1,32 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function HomeScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>
-        Sob Medida
-      </Text>
+      <Text style={styles.title}>Sob Medida</Text>
 
-      <Text style={styles.subtitle}>
-        App para costureiras
-      </Text>
+      <Text style={styles.subtitle}>Controle seu negócio!</Text>
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() =>
-          navigation.navigate('NovoCliente')
-        }
-      >
-        <Text style={styles.buttonText}>
-          Novo Cliente
-        </Text>
+        onPress={() => navigation.navigate('NovoCliente')} >
+
+        <Text style={styles.buttonText}>Novo Cliente</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() =>
-          navigation.navigate('Clientes')
-        }
-      >
-        <Text style={styles.buttonText}>
-          Ver Clientes
-        </Text>
+        onPress={() => navigation.navigate('Clientes')} >
+
+        <Text style={styles.buttonText}>Listar Clientes</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     justifyContent: 'center',

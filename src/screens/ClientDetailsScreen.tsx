@@ -1,7 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, } from 'react-native';
-
+import { useFocusEffect } from '@react-navigation/native';
+import { formatPhoneNumber } from '../utils/phoneMask';
 import database from '../database/database';
+
+interface Cliente {
+  id: number;
+  nome: string;
+  telefone: string | null;
+  email: string | null;
+  observacoes: string | null;
+}
 
 interface Medidas {
   busto: string;
@@ -20,112 +29,90 @@ interface Encomenda {
   observacoes: string;
 }
 
-export default function ClientDetailsScreen({
-  route,
-  navigation,
-}: any) {
+export default function ClientDetailsScreen({ route, navigation }: any) {
+  const initialClient = route.params.cliente as Cliente;
 
+  const [cliente, setCliente] = useState<Cliente>(initialClient);
   const [medidas, setMedidas] = useState<Medidas | null>(null);
   const [encomendas, setEncomendas] = useState<Encomenda[]>([]);
+  
+  const clienteId = initialClient.id;
 
-  const { cliente } = route.params;
+  useFocusEffect(
+    useCallback(() => {
+      try {
+        const clienteAtual = database.getFirstSync(
+          'SELECT * FROM clientes WHERE id = ?', [clienteId]
+        ) as Cliente | null;
 
-  function carregarMedidas() {
+        if (clienteAtual) {
+          setCliente(clienteAtual);
+        }
 
-    try {
+        const medidasAtuais = database.getFirstSync(
+          `
+            SELECT *
+            FROM medidas
+            WHERE cliente_id = ?
+            ORDER BY id DESC
+            LIMIT 1
+          `, [clienteId]
+        ) as Medidas | null;
 
-      const resultado = database.getFirstSync(
-        `
-          SELECT *
-          FROM medidas
-          WHERE cliente_id = ?
-          ORDER BY id DESC
-          LIMIT 1
-        `,
-        [cliente.id]
-      ) as Medidas | null;
+        setMedidas(medidasAtuais);
 
-      setMedidas(resultado);
+        const encomendasAtuais = database.getAllSync(
+          `
+            SELECT *
+            FROM encomendas
+            WHERE cliente_id = ?
+            ORDER BY id DESC
+          `, [clienteId]
+        ) as Encomenda[];
 
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  function carregarEncomendas() {
-
-  try {
-
-    const resultado = database.getAllSync(
-      `
-        SELECT *
-        FROM encomendas
-        WHERE cliente_id = ?
-        ORDER BY id DESC
-      `,
-      [cliente.id]
-    ) as Encomenda[];
-
-    setEncomendas(resultado);
-
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  useEffect(() => {
-    carregarMedidas();
-    carregarEncomendas();
-  }, []);
+        setEncomendas(encomendasAtuais);
+      } catch (error) {
+        console.error(error);
+        Alert.alert('Erro', 'Não foi possível atualizar os dados do cliente.');
+      }
+    }, [clienteId])
+  );
 
   function excluirCliente() {
 
-    Alert.alert(
-      'Excluir Cliente',
-      'Deseja realmente excluir este cliente?',
+    Alert.alert('Excluir Cliente', 'Deseja realmente excluir este cliente?',
       [
         {
           text: 'Cancelar',
           style: 'cancel',
         },
-
         {
           text: 'Excluir',
 
           onPress: () => {
-
             try {
-
               database.runSync(
                 `
                   DELETE FROM medidas
                   WHERE cliente_id = ?
-                `,
-                [cliente.id]
+                `, [cliente.id]
               );
 
               database.runSync(
                 `
                   DELETE FROM clientes
                   WHERE id = ?
-                `,
-                [cliente.id]
+                `, [cliente.id]
               );
 
-              Alert.alert(
-                'Sucesso',
-                'Cliente excluído'
-              );
+              Alert.alert('Sucesso', 'Cliente excluído');
 
               navigation.navigate('Clientes');
 
             } catch (error) {
 
               console.log(error);
-
-              Alert.alert(
-                'Erro',
-                'Não foi possível excluir'
-              );
+              Alert.alert('Erro', 'Não foi possível excluir');
             }
           },
         },
@@ -136,79 +123,57 @@ export default function ClientDetailsScreen({
   return (
     <ScrollView contentContainerStyle={styles.container}>
 
-      <Text style={styles.title}>
-        {cliente.nome}
-      </Text>
+      <Text style={styles.title}>{ cliente.nome }</Text>
 
       <View style={styles.card}>
 
-        <Text style={styles.label}>
-          Telefone
-        </Text>
+        <Text style={styles.label}>Telefone</Text>
 
         <Text style={styles.value}>
-          {cliente.telefone || 'Não informado'}
+          { formatPhoneNumber(cliente.telefone ?? '') || 'Não informado' }
         </Text>
 
       </View>
 
       <View style={styles.card}>
 
-        <Text style={styles.label}>
-          Email
-        </Text>
+        <Text style={styles.label}>Email</Text>
 
         <Text style={styles.value}>
-          {cliente.email || 'Não informado'}
+          { cliente.email || 'Não informado' }
         </Text>
 
       </View>
 
       <View style={styles.card}>
 
-        <Text style={styles.label}>
-          Observações
-        </Text>
+        <Text style={styles.label}>Observações</Text>
 
         <Text style={styles.value}>
-          {cliente.observacoes || 'Sem observações'}
+          { cliente.observacoes || 'Sem observações' }
         </Text>
 
       </View>
 
       <View style={styles.card}>
 
-        <Text style={styles.label}>
-          Medidas
-        </Text>
+        <Text style={styles.label}>Medidas</Text>
 
         {
           medidas ? (
             <>
-              <Text style={styles.value}>
-                Busto: {medidas.busto}
-              </Text>
+              <Text style={styles.value}>Busto: {medidas.busto}</Text>
 
-              <Text style={styles.value}>
-                Cintura: {medidas.cintura}
-              </Text>
+              <Text style={styles.value}>Cintura: {medidas.cintura}</Text>
 
-              <Text style={styles.value}>
-                Quadril: {medidas.quadril}
-              </Text>
+              <Text style={styles.value}>Quadril: {medidas.quadril}</Text>
 
-              <Text style={styles.value}>
-                Ombro: {medidas.ombro}
-              </Text>
+              <Text style={styles.value}>Ombro: {medidas.ombro}</Text>
 
-              <Text style={styles.value}>
-                Comprimento: {medidas.comprimento}
-              </Text>
+              <Text style={styles.value}>Comprimento: {medidas.comprimento}</Text>
             </>
           ) : (
-            <Text style={styles.value}>
-              Nenhuma medida cadastrada
-            </Text>
+            <Text style={styles.value}>Nenhuma medida cadastrada</Text>
           )
         }
 
@@ -216,44 +181,26 @@ export default function ClientDetailsScreen({
 
       <View style={styles.card}>
 
-        <Text style={styles.label}>
-          Encomendas
-        </Text>
+        <Text style={styles.label}>Encomendas</Text>
 
         {
           encomendas.length > 0 ? (
-          
             encomendas.map((item) => (
-            
-              <View
-                key={item.id}
-                style={styles.orderCard}
-              >
+              <View key={item.id} style={styles.orderCard}>
               
-                <Text style={styles.orderTitle}>
-                  {item.peca}
-                </Text>
+                <Text style={styles.orderTitle}>{item.peca}</Text>
             
-                <Text style={styles.value}>
-                  Valor: {item.valor || 'Não informado'}
-                </Text>
+                <Text style={styles.value}>Valor: {item.valor || 'Não informado'}</Text>
             
-                <Text style={styles.value}>
-                  Prazo: {item.prazo || 'Não informado'}
-                </Text>
+                <Text style={styles.value}>Prazo: {item.prazo || 'Não informado'}</Text>
             
-                <Text style={styles.value}>
-                  Status: {item.status || 'Não informado'}
-                </Text>
+                <Text style={styles.value}>Status: {item.status || 'Não informado'}</Text>
             
               </View>
             ))
           
-          ) : (
-          
-            <Text style={styles.value}>
-              Nenhuma encomenda cadastrada
-            </Text>
+          ) : (          
+            <Text style={styles.value}>Nenhuma encomenda cadastrada</Text>
           )
         }
 
@@ -261,67 +208,36 @@ export default function ClientDetailsScreen({
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() =>
-          navigation.navigate(
-            'EditarCliente',
-            {
-              cliente,
-            }
-          )
-        }
-      >
-        <Text style={styles.buttonText}>
-          Editar Cliente
-        </Text>
+        onPress={() => navigation.navigate('EditarCliente', {cliente})} >
+
+        <Text style={styles.buttonText}>Editar Cliente</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() =>
-          navigation.navigate(
-            'Medidas',
-            {
-              cliente,
-            }
-          )
-        }
-      >
-        <Text style={styles.buttonText}>
-          Adicionar Medidas
-        </Text>
+        onPress={() => navigation.navigate('Medidas', {cliente})} >
+
+        <Text style={styles.buttonText}>Adicionar Medidas</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() =>
-          navigation.navigate(
-            'NovaEncomenda',
-            {
-              cliente,
-            }
-          )
-        }
-      >
-        <Text style={styles.buttonText}>
-          Nova Encomenda
-        </Text>
+        onPress={() => navigation.navigate('NovaEncomenda', {cliente})} >
+
+        <Text style={styles.buttonText}>Nova Encomenda</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.deleteButton}
-        onPress={excluirCliente}
-      >
-        <Text style={styles.buttonText}>
-          Excluir Cliente
-        </Text>
-      </TouchableOpacity>
+        onPress={excluirCliente}>
 
+        <Text style={styles.buttonText}>Excluir Cliente</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flexGrow: 1,
     backgroundColor: '#F5EFE6',

@@ -1,50 +1,24 @@
 import { useState } from 'react';
-
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ScrollView,
-} from 'react-native';
-
+import { Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { formatPhoneNumber } from '../utils/phoneMask';
 import database from '../database/database';
 
-export default function EditClientScreen({
-  route,
-  navigation,
-}: any) {
-
+export default function EditClientScreen({ route, navigation }: any) {
   const { cliente } = route.params;
 
-  const [nome, setNome] =
-    useState(cliente.nome);
-
-  const [telefone, setTelefone] =
-    useState(cliente.telefone);
-
-  const [email, setEmail] =
-    useState(cliente.email);
-
-  const [observacoes, setObservacoes] =
-    useState(cliente.observacoes);
+  const [nome, setNome] = useState(cliente.nome);
+  const [telefone, setTelefone] = useState(formatPhoneNumber(cliente.telefone ?? ''));
+  const [email, setEmail] = useState(cliente.email);
+  const [observacoes, setObservacoes] = useState(cliente.observacoes);
 
   function atualizarCliente() {
-
     if (!nome.trim()) {
-
-      Alert.alert(
-        'Atenção',
-        'Digite o nome do cliente'
-      );
+      Alert.alert( 'Atenção', 'Digite o nome do cliente');
 
       return;
     }
 
     try {
-
       database.runSync(
         `
           UPDATE clientes
@@ -55,41 +29,24 @@ export default function EditClientScreen({
             observacoes = ?
           WHERE id = ?
         `,
-        [
-          nome,
-          telefone,
-          email,
-          observacoes,
-          cliente.id,
-        ]
+        [ nome, telefone, email, observacoes, cliente.id ]
       );
 
-      Alert.alert(
-        'Sucesso',
-        'Cliente atualizado'
-      );
+      Alert.alert('Sucesso', 'Cliente atualizado');
 
       navigation.goBack();
 
     } catch (error) {
-
       console.log(error);
 
-      Alert.alert(
-        'Erro',
-        'Não foi possível atualizar'
-      );
+      Alert.alert('Erro', 'Não foi possível atualizar');
     }
   }
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-    >
+    <ScrollView contentContainerStyle={styles.container} >
 
-      <Text style={styles.title}>
-        Editar Cliente
-      </Text>
+      <Text style={styles.title}>Editar Cliente</Text>
 
       <TextInput
         placeholder="Nome"
@@ -102,7 +59,9 @@ export default function EditClientScreen({
         placeholder="Telefone"
         style={styles.input}
         value={telefone}
-        onChangeText={setTelefone}
+        onChangeText={(value) => setTelefone(formatPhoneNumber(value))}
+        keyboardType="phone-pad"
+        maxLength={16}
       />
 
       <TextInput
@@ -121,13 +80,10 @@ export default function EditClientScreen({
         onChangeText={setObservacoes}
       />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={atualizarCliente}
-      >
-        <Text style={styles.buttonText}>
-          Salvar Alterações
-        </Text>
+      <TouchableOpacity style={styles.button} onPress={atualizarCliente}>
+
+        <Text style={styles.buttonText}>Salvar Alterações</Text>
+      
       </TouchableOpacity>
 
     </ScrollView>
@@ -135,7 +91,6 @@ export default function EditClientScreen({
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flexGrow: 1,
     backgroundColor: '#F5EFE6',
