@@ -1,29 +1,43 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import database from '../database/database';
 
 export default function NewOrderScreen({ route, navigation }: any) {
-  const { cliente } = route.params;
-
-  const [peca, setPeca]               = useState('');
-  const [valor, setValor]             = useState('');
-  const [prazo, setPrazo]             = useState('');
-  const [status, setStatus]           = useState('Em andamento');
-  const [observacoes, setObservacoes] = useState('');
+  
+  // `encomenda` só vem preenchida quando a tela é aberta para edição
+  const { cliente, encomenda } = route.params;
+  const editando = !!encomenda;
+  const [peca, setPeca]               = useState(encomenda?.peca ?? '');
+  const [valor, setValor]             = useState(encomenda?.valor ?? '');
+  const [prazo, setPrazo]             = useState(encomenda?.prazo ?? '');
+  const [status, setStatus]           = useState(encomenda?.status ?? 'Em andamento');
+  const [observacoes, setObservacoes] = useState(encomenda?.observacoes ?? '');
+  
+  // O título definido no App.tsx é fixo, então ajustamos aqui conforme o modo
+  useEffect(() => {
+    navigation.setOptions({ title: editando ? 'Editar Encomenda' : 'Nova Encomenda' });
+  }, [editando, navigation]);
 
   function salvarEncomenda() {
     if (!peca.trim()) {
       Alert.alert('Atenção', 'Digite a peça');
       return;
     }
+    
+    try{
+      if (editando) {
+        database.runSync(
+          `UPDATE encomendas SET peca = ?, valor = ?, prazo = ?, status = ?, observacoes = ? WHERE id = ?`,
+          [peca, valor, prazo, status, observacoes, encomenda.id]
+        );
+      } else {
+        database.runSync(
+          `INSERT INTO encomendas (cliente_id, peca, valor, prazo, status, observacoes) VALUES (?, ?, ?, ?, ?, ?)`,
+          [cliente.id, peca, valor, prazo, status, observacoes]
+        );
+      }
 
-    try {
-      database.runSync(
-        `INSERT INTO encomendas (cliente_id, peca, valor, prazo, status, observacoes) VALUES (?, ?, ?, ?, ?, ?)`,
-        [cliente.id, peca, valor, prazo, status, observacoes,]
-      );
-
-      Alert.alert('Sucesso', 'Encomenda salva');
+      Alert.alert('Sucesso', editando ? 'Encomenda Atualizada' : 'Encomenda salva');
       navigation.goBack();
 
     } catch (error) {
@@ -36,7 +50,7 @@ export default function NewOrderScreen({ route, navigation }: any) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
 
-      <Text style={styles.title}>Nova Encomenda</Text>
+      <Text style={styles.title}>{editando ? 'Editar Encomenda' : 'Nova Encomenda'}</Text>
       <Text style={styles.clientName}>{cliente.nome}</Text>
 
       <TextInput
@@ -78,7 +92,7 @@ export default function NewOrderScreen({ route, navigation }: any) {
 
       <TouchableOpacity style={styles.button} onPress={salvarEncomenda}>
 
-        <Text style={styles.buttonText}>Salvar Encomenda</Text>
+        <Text style={styles.buttonText}>{editando ? 'Salvar Alterações' : 'Salvar Encomenda'}</Text>
 
       </TouchableOpacity>
     </ScrollView>

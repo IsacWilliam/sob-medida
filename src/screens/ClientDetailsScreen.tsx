@@ -13,11 +13,11 @@ interface Cliente {
 }
 
 interface Medidas {
-  busto: string;
-  cintura: string;
-  quadril: string;
-  ombro: string;
-  comprimento: string;
+  busto: number | null;
+  cintura: number | null;
+  quadril: number | null;
+  ombro: number | null;
+  comprimento: number | null;
 }
 
 interface Encomenda {
@@ -27,6 +27,10 @@ interface Encomenda {
   prazo: string;
   status: string;
   observacoes: string;
+}
+
+function formatarMedida(valor: number | null): string{
+  return valor === null || valor === undefined ? '—' : String(valor).replace('.', ',');
 }
 
 export default function ClientDetailsScreen({ route, navigation }: any) {
@@ -162,15 +166,15 @@ export default function ClientDetailsScreen({ route, navigation }: any) {
         {
           medidas ? (
             <>
-              <Text style={styles.value}>Busto: {medidas.busto}</Text>
+              <Text style={styles.value}>Busto: {formatarMedida(medidas.busto)}</Text>
 
-              <Text style={styles.value}>Cintura: {medidas.cintura}</Text>
+              <Text style={styles.value}>Cintura: {formatarMedida(medidas.cintura)}</Text>
 
-              <Text style={styles.value}>Quadril: {medidas.quadril}</Text>
+              <Text style={styles.value}>Quadril: {formatarMedida(medidas.quadril)}</Text>
 
-              <Text style={styles.value}>Ombro: {medidas.ombro}</Text>
+              <Text style={styles.value}>Ombro: {formatarMedida(medidas.ombro)}</Text>
 
-              <Text style={styles.value}>Comprimento: {medidas.comprimento}</Text>
+              <Text style={styles.value}>Comprimento: {formatarMedida(medidas.comprimento)}</Text>
             </>
           ) : (
             <Text style={styles.value}>Nenhuma medida cadastrada</Text>
@@ -186,17 +190,21 @@ export default function ClientDetailsScreen({ route, navigation }: any) {
         {
           encomendas.length > 0 ? (
             encomendas.map((item) => (
-              <View key={item.id} style={styles.orderCard}>
+              <TouchableOpacity
+                key={item.id}
+                style={styles.orderCard}
+                onPress={() => navigation.navigate('NovaEncomenda', { cliente, encomenda: item })}>
               
                 <Text style={styles.orderTitle}>{item.peca}</Text>
             
                 <Text style={styles.value}>Valor: {item.valor || 'Não informado'}</Text>
             
                 <Text style={styles.value}>Prazo: {item.prazo || 'Não informado'}</Text>
-            
+
                 <Text style={styles.value}>Status: {item.status || 'Não informado'}</Text>
             
-              </View>
+                <Text style={styles.hint}>Toque para editar</Text>
+              </TouchableOpacity>
             ))
           
           ) : (          
@@ -305,5 +313,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#7A3E2B',
     marginBottom: 8,
+  },
+  
+  hint: {
+    fontSize: 13,
+    color: '#7A3E2B',
+    marginTop: 4
   },
 });
